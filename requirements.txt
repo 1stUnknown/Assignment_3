@@ -3,3 +3,9 @@ gymnasium[atari]
 gymnasium[accept-rom-license]
 ale-py
 autorom
+
+# pytorch torchvision torchaudio pytorch-cuda=12.4 -c pytorch -c nvidia
+pytorch
+torchvision
+torchaudio
+pytorch-cuda=12.4
