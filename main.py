@@ -1,6 +1,5 @@
 import gymnasium as gym
 import ale_py
-import time
 
 env = gym.make('ALE/Pong-v5', render_mode='human')
 
@@ -8,10 +7,9 @@ num_episodes = 5
 
 for episode in range(num_episodes):
     done = False
-    total_reward = 0
+    total_reward: float = 0
 
     state, info = env.reset()
-
 
     while not done:
         print(state, info)
@@ -23,7 +21,7 @@ for episode in range(num_episodes):
 
         next_state, reward, done, truncated, info = env.step(action)
 
-        total_reward += reward
+        total_reward += float(reward)
 
         state = next_state
 
