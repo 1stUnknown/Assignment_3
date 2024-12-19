@@ -18,10 +18,15 @@ class NeuralNetwork(nn.Module):
         return logits
 
 
-model = NeuralNetwork().to("cpu")
-print(model)
-X = torch.rand(1, 6, device="cpu")
-logits = model(X)
-pred_probab = nn.Softmax(dim=1)(logits)
-y_pred = pred_probab.argmax(1)
-print(f"Predicted class: {y_pred}")
+def main():
+    model = NeuralNetwork().to("cpu")
+    print(model)
+    X = torch.rand(1, 6, device="cpu")
+    logits = model(X)
+    pred_probab = nn.Softmax(dim=1)(logits)
+    y_pred = pred_probab.argmax(1)
+    print(f"Predicted class: {y_pred}")
+
+
+if __name__ == '__main__':
+    main()
