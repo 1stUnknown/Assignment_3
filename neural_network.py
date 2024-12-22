@@ -1,10 +1,7 @@
-import os
 import torch
 from torch import nn
 import numpy as np
 
-#state = np.ndarray
-#state.shape = (210, 160)
 
 class NeuralNetwork(nn.Module):
     def __init__(self):
@@ -22,13 +19,12 @@ class NeuralNetwork(nn.Module):
             nn.ReLU(),
             nn.Linear(512, 6),
         )
-        self.device = (
-        "cuda"
-        if torch.cuda.is_available()
-        else "mps"
-        if torch.backends.mps.is_available()
-        else "cpu"
-        )
+        self.device = ("cuda"
+                       if torch.cuda.is_available()
+                       else "mps"
+                       if torch.backends.mps.is_available()
+                       else "cpu"
+                       )
         self.to(self.device)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -38,26 +34,27 @@ class NeuralNetwork(nn.Module):
         return logits
 
     def predict_action(self, observations: np.ndarray) -> int:
-        array_output = self(torch.tensor(observations, 
+        array_output = self(torch.tensor(observations,
                                          dtype=torch.float32).to(self.device))
         return torch.argmax(array_output).item()
 
 
 def main():
-    device = (
-    "cuda"
-    if torch.cuda.is_available()
-    else "mps"
-    if torch.backends.mps.is_available()
-    else "cpu"
-    )
+    device = ("cuda"
+              if torch.cuda.is_available()
+              else "mps"
+              if torch.backends.mps.is_available()
+              else "cpu"
+              )
+
+    print(f"NN is using {device}")
+    # state = np.ndarray
+    # state.shape = (210, 160)
 
     model = NeuralNetwork()
     input = np.random.rand(1, 1, 210, 160)
     test = model.predict_action(input)
     print(test)
-    
-
 
 
 if __name__ == "__main__":
