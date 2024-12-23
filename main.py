@@ -22,9 +22,9 @@ def play_pong(nn: NeuralNetwork) -> None:
 
         while not done:
 
-            # give current states to the NNs
             # this is where you would insert your policy
 
+            # give current states to the NNs
             action = nn.predict_action(state.reshape((1, 1, 210, 160)))
 
             next_state, reward, done, truncated, info = env.step(action)
