@@ -8,7 +8,7 @@ class NeuralNetwork(nn.Module):
         super().__init__()
         self.pool = nn.MaxPool2d(4)
         self.flatten = nn.Flatten()
-        self.linear_relu_stack = nn.Sequential(
+        self.network = nn.Sequential(
             nn.Linear((210//4) * 40, 512),
             nn.ReLU(),
             nn.Linear(512, 512),
@@ -30,13 +30,21 @@ class NeuralNetwork(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.pool(x)
         x = self.flatten(x)
-        logits = self.linear_relu_stack(x)
+        logits = self.network(x)
         return logits
 
     def predict_action(self, observations: np.ndarray) -> int:
         array_output = self(torch.tensor(observations,
                                          dtype=torch.float32).to(self.device))
         return torch.argmax(array_output).item()
+
+    def weights(self) -> list[np.ndarray]:
+        weights_list: list[np.ndarray] = []
+        for layer in self.network:
+            if hasattr(layer, "weight"):
+                weights_list.append(layer.weight.detach().numpy())
+
+        return weights_list
 
 
 def main():
