@@ -4,7 +4,7 @@ import threading
 from gymnasium.wrappers import GrayscaleObservation
 from neural_network import NeuralNetwork
 
-nn_results = []
+nn_results: list[tuple] = []
 
 
 def play_pong(nn: NeuralNetwork) -> None:
@@ -40,7 +40,7 @@ def play_pong(nn: NeuralNetwork) -> None:
 
     # Close the
     env.close()
-    nn_results.append((whole_match_reward))
+    nn_results.append((whole_match_reward, nn.weights()))
 
 
 def main():
