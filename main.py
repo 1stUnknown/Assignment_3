@@ -3,7 +3,7 @@ import ale_py
 import threading
 from gymnasium.wrappers import GrayscaleObservation
 from neural_network import NeuralNetwork
-from saver import saving, loading
+from saver import saving
 
 nn_results: list[tuple] = []
 

@@ -1,7 +1,6 @@
 import torch
 from torch import nn
 import numpy as np
-from saver import loading, saving
 import random
 
 
@@ -53,19 +52,19 @@ class NeuralNetwork(nn.Module):
                     add_randomness: bool = False) -> None:
 
         for index in range(0, len(self.network), 2):
-            index = index // 2
+            weight_index = index // 2
             if add_randomness and random.random() < 0.1:
-                    random_value = np.random.uniform(
+                random_value = np.random.uniform(
                         -0.1, 0.1,
-                        new_weights[index].shape)
+                        new_weights[weight_index].shape)
             else:
                 random_value = np.zeros(
-                    new_weights[index].shape)
+                    new_weights[weight_index].shape)
 
             # min(1, max(-1, new_weights[index] + random_value))
             self.network[index].weight = nn.Parameter(torch.tensor(
-            new_weights[index] + random_value,
-            dtype=torch.float32).to(self.device))
+                new_weights[weight_index] + random_value,
+                dtype=torch.float32).to(self.device))
 
 
 def main():
