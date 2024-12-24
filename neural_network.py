@@ -1,7 +1,7 @@
 import torch
-from torch import nn
 import numpy as np
 import random
+from torch import nn
 
 
 class NeuralNetwork(nn.Module):
@@ -34,9 +34,11 @@ class NeuralNetwork(nn.Module):
         logits = self.network(x)
         return logits
 
+    def _tensor(self, data: any) -> torch.Tensor:
+        return torch.tensor(data, dtype=torch.float32).to(self.device)
+
     def predict_action(self, observations: np.ndarray) -> int:
-        array_output = self(torch.tensor(observations,
-                                         dtype=torch.float32).to(self.device))
+        array_output = self(self._tensor(observations))
         return torch.argmax(array_output).item()
 
     def weights(self) -> list[np.ndarray]:
@@ -62,9 +64,8 @@ class NeuralNetwork(nn.Module):
                     new_weights[weight_index].shape)
 
             # min(1, max(-1, new_weights[index] + random_value))
-            self.network[index].weight = nn.Parameter(torch.tensor(
-                new_weights[weight_index] + random_value,
-                dtype=torch.float32).to(self.device))
+            self.network[index].weight = nn.Parameter(self._tensor(
+                new_weights[weight_index] + random_value))
 
 
 def main():
