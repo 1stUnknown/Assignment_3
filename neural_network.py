@@ -25,6 +25,7 @@ class NeuralNetwork(nn.Module):
                        if torch.backends.mps.is_available()
                        else "cpu"
                        )
+        print(f"NN is using {self.device}")
         self.to(self.device)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -42,22 +43,13 @@ class NeuralNetwork(nn.Module):
         weights_list: list[np.ndarray] = []
         for layer in self.network:
             if hasattr(layer, "weight"):
-                weights_list.append(layer.weight.detach().numpy())
+                cpu_tensor = layer.weight.detach().cpu()
+                weights_list.append(cpu_tensor.numpy())
 
         return weights_list
 
 
 def main():
-    device = ("cuda"
-              if torch.cuda.is_available()
-              else "mps"
-              if torch.backends.mps.is_available()
-              else "cpu"
-              )
-
-    print(f"NN is using {device}")
-    # state = np.ndarray
-    # state.shape = (210, 160)
 
     model = NeuralNetwork()
     input = np.random.rand(1, 1, 210, 160)
