@@ -5,8 +5,8 @@ import numpy as np
 
 def saving(weights: list[np.ndarray], file_name: str) -> None:
     """
-    saves the weights in the savedweights folder
-    If savedweigths doesn't exist yet, it will create the folder.
+    saves the weights in the 'savedweights' folder
+    If 'savedweigths' doesn't exist yet, it will create the folder.
     """
     if not os.path.exists("./savedweights"):
         os.makedirs("./savedweights")
@@ -18,9 +18,9 @@ def saving(weights: list[np.ndarray], file_name: str) -> None:
 
 
 def loading(file_name: str) -> list[np.ndarray]:
-    """loads the weights from the savedweigths directory"""
+    """loads the weights from the 'savedweights' directory"""
     if not os.path.exists("./savedweights/"):
-        raise FileNotFoundError("savedweights directory not found")
+        raise FileNotFoundError("'savedweights' directory not found")
     elif not os.path.exists(f"./savedweights/{file_name}.json"):
         raise FileNotFoundError(f"{file_name} file not found")
 
@@ -34,5 +34,5 @@ def loading(file_name: str) -> list[np.ndarray]:
 
         return return_list
     except ValueError:
-        raise ValueError("couldn't import from quicksave,"
+        raise ValueError("couldn't import from weight file,"
                          + " the file might be corrupted")
