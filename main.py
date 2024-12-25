@@ -69,7 +69,7 @@ def main():
                 t.join()
 
             # order the results
-            sorted_results = sorted(nn_results, key=lambda x: x[1])[-top_x:]
+            sorted_results = sorted(nn_results, key=lambda x: x[1])
             top_results = sorted_results[-top_x:]
             id_of_top_results = [_[0] for _ in top_results]
 
@@ -79,6 +79,7 @@ def main():
 
                 list_of_nn[index].set_weights(choice(top_results)[2], True)
 
+            nn_results.clear()
     except KeyboardInterrupt:
         # save everything the top x
         top_results = sorted(nn_results, key=lambda x: x[1])[-top_x:]
