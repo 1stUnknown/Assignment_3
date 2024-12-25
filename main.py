@@ -1,6 +1,7 @@
 import gymnasium as gym
 import ale_py
 import threading
+from random import choice
 from gymnasium.wrappers import GrayscaleObservation
 from neural_network import NeuralNetwork
 from saver import saving
@@ -71,12 +72,12 @@ def main():
             sorted_results = sorted(nn_results, key=lambda x: x[1])[-top_x:]
             top_results = sorted_results[-top_x:]
             id_of_top_results = [_[0] for _ in top_results]
-            # TODO adjust and apply the top weights
+
             for index in range(len(list_of_nn)):
                 if index in id_of_top_results:
                     continue
 
-                list_of_nn[index].set_weights(top_results[0][2], True)
+                list_of_nn[index].set_weights(choice(top_results)[2], True)
 
     except KeyboardInterrupt:
         # save everything the top x
