@@ -52,6 +52,9 @@ def main():
     list_of_nn: list[NeuralNetwork] = [NeuralNetwork() for _ in
                                        range(amount_of_nns)]
 
+    # TODO add auto check if ther are saved weights.
+    # TODO add atuo aply weights if they are there.
+
     try:
         while True:
             threads = []
