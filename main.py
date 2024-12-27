@@ -6,7 +6,7 @@ import numpy as np
 from random import choice
 from gymnasium.wrappers import GrayscaleObservation
 from neural_network import NeuralNetwork
-from saver import saving
+from saver import saving, loading
 from utility import get_top
 
 nn_results: list[tuple[int, float, np.ndarray]] = []
@@ -56,8 +56,17 @@ def main():
                                        range(amount_of_nns)]
 
     if os.path.isdir("./savedweights"):
-        pass
-        # TODO add auto apply weights if they are there.
+        file_names: list[str] = os.listdir("./savedweights")
+
+        saved_weights: list[list[np.ndarray]] = []
+        for name in file_names:
+            saved_weights.append(loading(name))
+
+        for index, weight in enumerate(saved_weights):
+            list_of_nn[index].set_weights(weight)
+
+        for index in range(len(saved_weights), len(nn_results)):
+            list_of_nn[index].set_weights(choice(saved_weights), True)
 
     try:
         while True:
