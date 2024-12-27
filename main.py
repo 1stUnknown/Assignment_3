@@ -1,6 +1,7 @@
 import gymnasium as gym
 import ale_py
 import threading
+import os
 from random import choice
 from gymnasium.wrappers import GrayscaleObservation
 from neural_network import NeuralNetwork
@@ -52,8 +53,9 @@ def main():
     list_of_nn: list[NeuralNetwork] = [NeuralNetwork() for _ in
                                        range(amount_of_nns)]
 
-    # TODO add auto check if ther are saved weights.
-    # TODO add atuo aply weights if they are there.
+    if os.path.isdir("./savedweights"):
+        pass
+        # TODO add auto apply weights if they are there.
 
     try:
         while True:
