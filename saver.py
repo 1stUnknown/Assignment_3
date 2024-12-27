@@ -24,6 +24,8 @@ def loading(file_name: str) -> list[np.ndarray]:
     elif not os.path.exists(f"./savedweights/{file_name}.json"):
         raise FileNotFoundError(f"{file_name} file not found")
 
+    file_name = file_name.removesuffix(".json")
+
     try:
         with open(f"./savedweights/{file_name}.json", "r") as file:
             dict_of_file = json.load(file)
