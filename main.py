@@ -2,12 +2,14 @@ import gymnasium as gym
 import ale_py
 import threading
 import os
+import numpy as np
 from random import choice
 from gymnasium.wrappers import GrayscaleObservation
 from neural_network import NeuralNetwork
 from saver import saving
+from utility import get_top
 
-nn_results: list[tuple] = []
+nn_results: list[tuple[int, float, np.ndarray]] = []
 
 
 def play_pong(nn: NeuralNetwork, id: int) -> None:
@@ -74,22 +76,20 @@ def main():
                 t.join()
 
             # order the results
-            sorted_results = sorted(nn_results, key=lambda x: x[1])
-            top_results = sorted_results[-top_x:]
-            id_of_top_results = [_[0] for _ in top_results]
+            top_weights, id_of_top_results = get_top(nn_results, top_x)
 
             for index in range(len(list_of_nn)):
                 if index in id_of_top_results:
                     continue
 
-                list_of_nn[index].set_weights(choice(top_results)[2], True)
+                list_of_nn[index].set_weights(choice(top_weights), True)
 
             nn_results.clear()
     except KeyboardInterrupt:
         # save everything the top x
-        top_results = sorted(nn_results, key=lambda x: x[1])[-top_x:]
-        for index, result in enumerate(top_results):
-            saving(result[2], f"{index}")
+        top_weights, _ = get_top(nn_results, top_x)
+        for index, weight in enumerate(top_weights):
+            saving(weight, f"{index}")
 
 
 if __name__ == "__main__":
