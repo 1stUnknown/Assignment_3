@@ -1,10 +1,16 @@
 import gymnasium as gym
-import ale_py
-import threading
-import os
-import numpy as np
-from random import choice
 from gymnasium.wrappers import GrayscaleObservation
+import ale_py
+
+import numpy as np
+
+from os import listdir
+from os.path import isdir
+
+from threading import Thread
+
+from random import choice
+
 from neural_network import NeuralNetwork
 from saver import saving, loading
 from utility import get_top
@@ -55,8 +61,8 @@ def main():
     list_of_nn: list[NeuralNetwork] = [NeuralNetwork() for _ in
                                        range(amount_of_nns)]
 
-    if os.path.isdir("./savedweights"):
-        file_names: list[str] = os.listdir("./savedweights")
+    if isdir("./savedweights"):
+        file_names: list[str] = listdir("./savedweights")
 
         saved_weights: list[list[np.ndarray]] = []
         for name in file_names:
@@ -73,8 +79,8 @@ def main():
             threads = []
 
             for index, nn in enumerate(list_of_nn):
-                threads.append(threading.Thread(target=play_pong,
-                                                args=(nn, index,)))
+                threads.append(Thread(target=play_pong,
+                                      args=(nn, index,)))
 
             # Start all threads.
             for t in threads:
