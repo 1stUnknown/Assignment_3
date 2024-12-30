@@ -55,7 +55,7 @@ def play_pong(nn: NeuralNetwork, id: int) -> None:
 
 
 def main():
-    amount_of_nns = 3
+    amount_of_nns = 5
     top_x = 2
 
     list_of_nn: list[NeuralNetwork] = [NeuralNetwork() for _ in
