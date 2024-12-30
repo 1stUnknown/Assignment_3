@@ -55,7 +55,7 @@ class NeuralNetwork(nn.Module):
 
         for index in range(0, len(self.network), 2):
             weight_index = index // 2
-            if add_randomness and random.random() < 0.1:
+            if add_randomness:
                 random_value = np.random.uniform(
                         -0.1, 0.1,
                         new_weights[weight_index].shape)
