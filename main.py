@@ -1,12 +1,21 @@
 import gymnasium as gym
-import ale_py
-import threading
-from random import choice
 from gymnasium.wrappers import GrayscaleObservation
-from neural_network import NeuralNetwork
-from saver import saving
+import ale_py
 
-nn_results: list[tuple] = []
+import numpy as np
+
+from os import listdir
+from os.path import isdir
+
+from threading import Thread
+
+from random import choice
+
+from neural_network import NeuralNetwork
+from saver import saving, loading
+from utility import get_top
+
+nn_results: list[tuple[int, float, np.ndarray]] = []
 
 
 def play_pong(nn: NeuralNetwork, id: int) -> None:
@@ -46,22 +55,32 @@ def play_pong(nn: NeuralNetwork, id: int) -> None:
 
 
 def main():
-    amount_of_nns = 3
+    amount_of_nns = 5
     top_x = 2
 
     list_of_nn: list[NeuralNetwork] = [NeuralNetwork() for _ in
                                        range(amount_of_nns)]
 
-    # TODO add auto check if ther are saved weights.
-    # TODO add atuo aply weights if they are there.
+    if isdir("./savedweights"):
+        file_names: list[str] = listdir("./savedweights")
+
+        saved_weights: list[list[np.ndarray]] = []
+        for name in file_names:
+            saved_weights.append(loading(name))
+
+        for index, weight in enumerate(saved_weights):
+            list_of_nn[index].set_weights(weight)
+
+        for index in range(len(saved_weights), len(nn_results)):
+            list_of_nn[index].set_weights(choice(saved_weights), True)
 
     try:
         while True:
             threads = []
 
             for index, nn in enumerate(list_of_nn):
-                threads.append(threading.Thread(target=play_pong,
-                                                args=(nn, index,)))
+                threads.append(Thread(target=play_pong,
+                                      args=(nn, index,)))
 
             # Start all threads.
             for t in threads:
@@ -72,22 +91,20 @@ def main():
                 t.join()
 
             # order the results
-            sorted_results = sorted(nn_results, key=lambda x: x[1])
-            top_results = sorted_results[-top_x:]
-            id_of_top_results = [_[0] for _ in top_results]
+            top_weights, id_of_top_results = get_top(nn_results, top_x)
 
             for index in range(len(list_of_nn)):
                 if index in id_of_top_results:
                     continue
 
-                list_of_nn[index].set_weights(choice(top_results)[2], True)
+                list_of_nn[index].set_weights(choice(top_weights), True)
 
             nn_results.clear()
     except KeyboardInterrupt:
         # save everything the top x
-        top_results = sorted(nn_results, key=lambda x: x[1])[-top_x:]
-        for index, result in enumerate(top_results):
-            saving(result[2], f"{index}")
+        top_weights, _ = get_top(nn_results, top_x)
+        for index, weight in enumerate(top_weights):
+            saving(weight, f"{index}")
 
 
 if __name__ == "__main__":

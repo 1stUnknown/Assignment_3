@@ -11,7 +11,7 @@ def saving(weights: list[np.ndarray], file_name: str) -> None:
     if not os.path.exists("./savedweights"):
         os.makedirs("./savedweights")
 
-    with open(f"./savedweights/{file_name}.json", "w") as file:
+    with open(f"./savedweights/{file_name}.json", "w+") as file:
         json.dump({index: weight.tolist() for index, weight in
                    enumerate(weights)},
                   file, indent=4)
@@ -24,8 +24,10 @@ def loading(file_name: str) -> list[np.ndarray]:
     elif not os.path.exists(f"./savedweights/{file_name}.json"):
         raise FileNotFoundError(f"{file_name} file not found")
 
+    file_name = file_name.removesuffix(".json")
+
     try:
-        with open(f"./savedweights/{file_name}.json", "r") as file:
+        with open(f"./savedweights/{file_name}.json", "r+") as file:
             dict_of_file = json.load(file)
 
         return_list = []
