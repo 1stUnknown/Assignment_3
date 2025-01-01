@@ -44,14 +44,14 @@ def play_pong(nn: NeuralNetwork, id: int) -> None:
 
             state = next_state
 
-        print(
-            f"Episode {episode + 1} finished with total reward: {total_reward}"
-            )
         whole_match_reward += total_reward
+    print(
+        f"{id} finished with total reward: {whole_match_reward}"
+        )
 
     # Close the
-    env.close()
     nn_results.append((id, whole_match_reward, nn.weights()))
+    env.close()
 
 
 def main():
@@ -66,12 +66,13 @@ def main():
 
         saved_weights: list[list[np.ndarray]] = []
         for name in file_names:
-            saved_weights.append(loading(name))
+            test = loading(name)
+            saved_weights.append(test)
 
         for index, weight in enumerate(saved_weights):
             list_of_nn[index].set_weights(weight)
 
-        for index in range(len(saved_weights), len(nn_results)):
+        for index in range(len(saved_weights), amount_of_nns):
             list_of_nn[index].set_weights(choice(saved_weights), True)
 
     try:
@@ -93,7 +94,7 @@ def main():
             # order the results
             top_weights, id_of_top_results = get_top(nn_results, top_x)
 
-            for index in range(len(list_of_nn)):
+            for index in range(amount_of_nns):
                 if index in id_of_top_results:
                     continue
 
@@ -102,9 +103,12 @@ def main():
             nn_results.clear()
     except KeyboardInterrupt:
         # save everything the top x
+        print("[INFO] Exiting after KeyboardInterupt; proceeding to save weights before exiting")
         top_weights, _ = get_top(nn_results, top_x)
         for index, weight in enumerate(top_weights):
             saving(weight, f"{index}")
+        print("[INFO] Exiting after Saving!")
+        
 
 
 if __name__ == "__main__":

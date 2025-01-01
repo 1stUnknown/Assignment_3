@@ -19,12 +19,12 @@ def saving(weights: list[np.ndarray], file_name: str) -> None:
 
 def loading(file_name: str) -> list[np.ndarray]:
     """loads the weights from the 'savedweights' directory"""
+    file_name = file_name.removesuffix(".json")
+
     if not os.path.exists("./savedweights/"):
         raise FileNotFoundError("'savedweights' directory not found")
     elif not os.path.exists(f"./savedweights/{file_name}.json"):
         raise FileNotFoundError(f"{file_name} file not found")
-
-    file_name = file_name.removesuffix(".json")
 
     try:
         with open(f"./savedweights/{file_name}.json", "r+") as file:
