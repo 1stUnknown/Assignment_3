@@ -66,8 +66,8 @@ def main():
 
         saved_weights: list[list[np.ndarray]] = []
         for name in file_names:
-            test = loading(name)
-            saved_weights.append(test)
+            data = loading(name)
+            saved_weights.append(data)
 
         for index, weight in enumerate(saved_weights):
             list_of_nn[index].set_weights(weight)
@@ -92,10 +92,10 @@ def main():
                 t.join()
 
             # order the results
-            top_weights, id_of_top_results = get_top(nn_results, top_x)
+            top_weights, ids_of_top_results = get_top(nn_results, top_x)
 
             for index in range(amount_of_nns):
-                if index in id_of_top_results:
+                if index in ids_of_top_results:
                     continue
 
                 list_of_nn[index].set_weights(choice(top_weights), True)
@@ -104,11 +104,13 @@ def main():
     except KeyboardInterrupt:
         # save everything the top x
         print("[INFO] Exiting after KeyboardInterupt; proceeding to save weights before exiting")
+        for t in threads:
+                t.join()
+
         top_weights, _ = get_top(nn_results, top_x)
         for index, weight in enumerate(top_weights):
             saving(weight, f"{index}")
         print("[INFO] Exiting after Saving!")
-        
 
 
 if __name__ == "__main__":
