@@ -18,14 +18,13 @@ from utility import get_top
 nn_results: list[tuple[int, float, np.ndarray]] = []
 
 
-def play_pong(nn: NeuralNetwork, id: int) -> None:
+def play_pong(nn: NeuralNetwork, id: int, num_episodes: int = 5) -> None:
     global nn_results
     env = gym.make('ALE/Pong-v5')
     env = GrayscaleObservation(env)
-    num_episodes = 5
 
     whole_match_reward = 0
-    for episode in range(num_episodes):
+    for _ in range(num_episodes):
         done = False
         total_reward: float = 0
 
@@ -55,8 +54,9 @@ def play_pong(nn: NeuralNetwork, id: int) -> None:
 
 
 def main():
-    amount_of_nns = 5
-    top_x = 2
+    amount_of_nns = 10
+    top_x = 3
+    num_episodes = 10
 
     list_of_nn: list[NeuralNetwork] = [NeuralNetwork() for _ in
                                        range(amount_of_nns)]
@@ -81,7 +81,7 @@ def main():
 
             for index, nn in enumerate(list_of_nn):
                 threads.append(Thread(target=play_pong,
-                                      args=(nn, index,)))
+                                      args=(nn, index, num_episodes,)))
 
             # Start all threads.
             for t in threads:
