@@ -16,7 +16,10 @@ from utility import get_top
 nn_results: list[tuple[int, float, np.ndarray]] = []
 
 
-def play_pong(nn: NeuralNetwork, id: int, num_episodes: int = 5, test: tuple = (0,100)) -> list[float]:
+def play_pong(nn: NeuralNetwork,
+              id: int,
+              num_episodes: int = 5,
+              seed_range: tuple = (0, 100)) -> list[float]:
     global nn_results
     env = gym.make('ALE/Pong-v5')
     env = GrayscaleObservation(env)
@@ -26,7 +29,7 @@ def play_pong(nn: NeuralNetwork, id: int, num_episodes: int = 5, test: tuple = (
         done = False
         total_reward: float = 0
 
-        state, info = env.reset(randint(test[0], test[1]))
+        state, info = env.reset(randint(seed_range[0], seed_range[1]))
 
         while not done:
 
@@ -75,8 +78,8 @@ def main():
     try:
         main_loop(list_of_nn, top_x=top_x, num_episodes=num_episodes)
     except KeyboardInterrupt:
-        # TODO save the total rewards between test and validate
-        print("[INFO] Exiting after KeyboardInterupt; proceeding to save weights before exiting")
+        print("[INFO] Exiting after KeyboardInterrupt;" +
+              " proceeding to save weights before exiting")
         top_weights, _ = get_top(nn_results, top_x)
         for index, weight in enumerate(top_weights):
             saving(weight, f"{index}")
@@ -105,11 +108,13 @@ def testing() -> float:
         for index in range(len(saved_weights), amount_of_nns):
             list_of_nn[index].set_weights(choice(saved_weights), True)
 
-    results = main_loop(list_of_nn, length_of_running_program=100, top_x=top_x,
-              num_episodes=num_episodes, modify_weights=False)
-    
+    results = main_loop(list_of_nn,
+                        length_of_running_program=100,
+                        top_x=top_x,
+                        num_episodes=num_episodes, modify_weights=False)
+
     return sum(results)/len(results)
-    
+
 
 def validate() -> float:
     """
@@ -136,23 +141,25 @@ def validate() -> float:
         for index in range(len(saved_weights), amount_of_nns):
             list_of_nn[index].set_weights(choice(saved_weights), True)
 
-    results = main_loop(list_of_nn, range_of_seed=(100, 200),
-              length_of_running_program=100, top_x = top_x,
-              num_episodes = num_episodes, modify_weights=False)
-    
-    return sum(results)/len(results)
-    
+    results = main_loop(list_of_nn,
+                        range_of_seed=(100, 200),
+                        length_of_running_program=100,
+                        top_x=top_x,
+                        num_episodes=num_episodes,
+                        modify_weights=False)
 
-def main_loop(list_of_nn: list[NeuralNetwork], 
-              range_of_seed: tuple = (0,100), 
+    return sum(results)/len(results)
+
+
+def main_loop(list_of_nn: list[NeuralNetwork],
+              range_of_seed: tuple = (0, 100),
               length_of_running_program: int = float("inf"),
-              top_x: int = 3, num_episodes: int = 10, 
+              top_x: int = 3, num_episodes: int = 10,
               modify_weights: bool = True) -> list[float]:
 
     if top_x >= len(list_of_nn):
         raise ValueError("top x is equal or greater than"
                          + "the amount of neural networks given")
-
 
     i = 0
     list_of_match_results = []
@@ -161,10 +168,10 @@ def main_loop(list_of_nn: list[NeuralNetwork],
 
         for index, nn in enumerate(list_of_nn):
             threads.append(Thread(target=play_pong,
-                                    args=(nn, 
-                                          index, 
-                                          num_episodes, 
-                                          range_of_seed,)))
+                                  args=(nn,
+                                        index,
+                                        num_episodes,
+                                        range_of_seed,)))
 
         # Start all threads.
         for t in threads:
@@ -184,7 +191,7 @@ def main_loop(list_of_nn: list[NeuralNetwork],
 
                 list_of_nn[index].set_weights(choice(top_weights), True)
         list_of_match_results.append(item[1] for item in nn_results)
-        # I don't know if this would work. I would just use list comprehension instead of slicing
+
         nn_results.clear()
         i += 1
 
@@ -193,6 +200,6 @@ def main_loop(list_of_nn: list[NeuralNetwork],
 
 if __name__ == "__main__":
     main()
-    #testing_results = testing()
-    #validation_results = validate()
-    #print(validation_results - testing_results)
+    # testing_results = testing()
+    # validation_results = validate()
+    # print(validation_results - testing_results)
