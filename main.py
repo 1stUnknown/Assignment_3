@@ -105,6 +105,9 @@ def main():
         # save everything the top x
         print("[INFO] Exiting after KeyboardInterupt; proceeding to save weights before exiting")
 
+        for t in threads:
+            t.join()
+
         top_weights, _ = get_top(nn_results, top_x)
         for index, weight in enumerate(top_weights):
             saving(weight, f"{index}")
