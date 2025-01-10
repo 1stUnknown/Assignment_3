@@ -16,7 +16,10 @@ from utility import get_top
 nn_results: list[tuple[int, float, np.ndarray]] = []
 
 
-def play_pong(nn: NeuralNetwork, id: int, num_episodes: int = 5, range_of_seed: tuple = (0,100)) -> list[float]:
+def play_pong(nn: NeuralNetwork,
+              id: int,
+              num_episodes: int = 5,
+              range_of_seed: tuple = (0,100)) -> list[float]:
     global nn_results
     env = gym.make('ALE/Pong-v5')
     env = GrayscaleObservation(env)
