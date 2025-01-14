@@ -57,7 +57,7 @@ class NeuralNetwork(nn.Module):
             max_val: float = abs(new_weights[weight_index].max())
             if add_randomness:
                 random_value = np.random.uniform(
-                        -0.1 * max_val, 0.1 * max_val,
+                        -0.01 * max_val, 0.01 * max_val,
                         new_weights[weight_index].shape)
             else:
                 random_value = np.zeros(
