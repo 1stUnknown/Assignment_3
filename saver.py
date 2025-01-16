@@ -36,5 +36,5 @@ def loading(file_name: str) -> list[np.ndarray]:
 
         return return_list
     except ValueError:
-        raise ValueError("couldn't import from weight file,"
+        raise ValueError(f"couldn't import weights from {file_name}.json,"
                          + " the file might be corrupted")

@@ -195,7 +195,7 @@ def main_loop(list_of_nn: list[NeuralNetwork],
 
 
 if __name__ == "__main__":
-    main()
-    #testing_results = testing()
-    #validation_results = validate()
-    #print(validation_results - testing_results)
+    # main()
+    testing_results = testing()
+    validation_results = validate()
+    print(validation_results - testing_results)
