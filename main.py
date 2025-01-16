@@ -186,7 +186,7 @@ def main_loop(list_of_nn: list[NeuralNetwork],
                     continue
 
                 list_of_nn[index].set_weights(choice(top_weights), True)
-        list_of_match_results.append(item[1] for item in nn_results)
+        list_of_match_results.extend([item[1] for item in nn_results])
         # I don't know if this would work. I would just use list comprehension instead of slicing
         nn_results.clear()
         i += 1
