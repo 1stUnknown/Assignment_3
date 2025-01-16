@@ -3,21 +3,29 @@ import json
 import numpy as np
 
 
-def saving(weights: list[np.ndarray], file_name: str) -> None:
+def save_to_json(item, file_path: str, file_name: str) -> None:
     """
-    saves the weights in the 'savedweights' folder
+    saves lists to json files
+    """
+    file_name = file_name.removesuffix(".json")
+
+    if not os.path.exists("./" + file_path):
+        os.makedirs("./" + file_path)
+
+    with open(f"./{file_path}/{file_name}.json", "w+") as file:
+        json.dump(item, file, indent=4)
+
+def saving_weights_to_json(weights: list[np.ndarray], file_name: str) -> None:
+    """
+    saves the weights to the 'savedweights' folder as a .json file
     If 'savedweigths' doesn't exist yet, it will create the folder.
     """
-    if not os.path.exists("./savedweights"):
-        os.makedirs("./savedweights")
 
-    with open(f"./savedweights/{file_name}.json", "w+") as file:
-        json.dump({index: weight.tolist() for index, weight in
+    save_to_json({index: weight.tolist() for index, weight in
                    enumerate(weights)},
-                  file, indent=4)
+                   "savedweights", file_name)
 
-
-def loading(file_name: str) -> list[np.ndarray]:
+def loading_weights_from_json(file_name: str) -> list[np.ndarray]:
     """loads the weights from the 'savedweights' directory"""
     file_name = file_name.removesuffix(".json")
 

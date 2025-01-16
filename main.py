@@ -10,7 +10,7 @@ from os.path import isdir
 from threading import Thread
 
 from neural_network import NeuralNetwork
-from saver import saving, loading
+from saver import save_to_json, saving_weights_to_json, loading_weights_from_json
 from utility import get_top
 
 nn_results: list[tuple[int, float, np.ndarray]] = []
@@ -67,7 +67,7 @@ def main():
 
         saved_weights: list[list[np.ndarray]] = []
         for name in file_names:
-            data = loading(name)
+            data = loading_weights_from_json(name)
             saved_weights.append(data)
 
         for index, weight in enumerate(saved_weights):
@@ -82,7 +82,7 @@ def main():
         print("[INFO] Exiting after KeyboardInterupt; proceeding to save weights before exiting")
         top_weights, _ = get_top(nn_results, top_x)
         for index, weight in enumerate(top_weights):
-            saving(weight, f"{index}")
+            saving_weights_to_json(weight, f"{index}")
         print("[INFO] Exiting after Saving!")
 
 
@@ -99,7 +99,7 @@ def testing() -> float:
 
         saved_weights: list[list[np.ndarray]] = []
         for name in file_names:
-            data = loading(name)
+            data = loading_weights_from_json(name)
             saved_weights.append(data)
 
         for index, weight in enumerate(saved_weights):
@@ -111,6 +111,8 @@ def testing() -> float:
     results = main_loop(list_of_nn, length_of_running_program=100, top_x=top_x,
               num_episodes=num_episodes, modify_weights=False)
     
+    save_to_json(results, "savedresults", "testing.json")
+
     return sum(results)/len(results)
     
 
@@ -130,7 +132,7 @@ def validate() -> float:
 
         saved_weights: list[list[np.ndarray]] = []
         for name in file_names:
-            data = loading(name)
+            data = loading_weights_from_json(name)
             saved_weights.append(data)
 
         for index, weight in enumerate(saved_weights):
@@ -143,6 +145,8 @@ def validate() -> float:
               length_of_running_program=100, top_x = top_x,
               num_episodes = num_episodes, modify_weights=False)
     
+    save_to_json(results, "savedresults", "validation")
+
     return sum(results)/len(results)
     
 
