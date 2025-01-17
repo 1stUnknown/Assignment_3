@@ -27,17 +27,9 @@ def saving_weights_to_json(weights: list[np.ndarray], file_name: str) -> None:
 
 def loading_weights_from_json(file_name: str) -> list[np.ndarray]:
     """loads the weights from the 'savedweights' directory"""
-    file_name = file_name.removesuffix(".json")
-
-    if not os.path.exists("./savedweights/"):
-        raise FileNotFoundError("'savedweights' directory not found")
-    elif not os.path.exists(f"./savedweights/{file_name}.json"):
-        raise FileNotFoundError(f"{file_name} file not found")
-
+    
     try:
-        with open(f"./savedweights/{file_name}.json", "r+") as file:
-            dict_of_file = json.load(file)
-
+        dict_of_file = loading_from_json("savedweights", file_name)
         return_list = []
         for key in dict_of_file.keys():
             return_list.append(np.array(dict_of_file[key]))
@@ -45,4 +37,20 @@ def loading_weights_from_json(file_name: str) -> list[np.ndarray]:
         return return_list
     except ValueError:
         raise ValueError(f"couldn't import weights from {file_name}.json,"
+                         + " the file might be corrupted")
+
+def loading_from_json(file_path: str, file_name: str) -> list[np.ndarray]:
+    """loads the weights from the 'savedweights' directory"""
+    file_name = file_name.removesuffix(".json")
+
+    if not os.path.exists("./" + file_path):
+        raise FileNotFoundError(f"{file_path} directory not found")
+    elif not os.path.exists(f"./{file_path}/{file_name}.json"):
+        raise FileNotFoundError(f"{file_name} file not found")
+
+    try:
+        with open(f"./{file_path}/{file_name}.json", "r+") as file:
+            return json.load(file)
+    except ValueError:
+        raise ValueError(f"couldn't import from {file_name}.json,"
                          + " the file might be corrupted")

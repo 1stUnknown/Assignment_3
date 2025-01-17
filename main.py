@@ -10,7 +10,8 @@ from os.path import isdir
 from threading import Thread
 
 from neural_network import NeuralNetwork
-from saver import save_to_json, saving_weights_to_json, loading_weights_from_json
+from saver import (save_to_json, saving_weights_to_json,
+                   loading_from_json, loading_weights_from_json)
 from utility import get_top
 
 nn_results: list[tuple[int, float, np.ndarray]] = []
@@ -200,6 +201,8 @@ def main_loop(list_of_nn: list[NeuralNetwork],
 
 if __name__ == "__main__":
     # main()
-    testing_results = testing()
-    validation_results = validate()
-    print(validation_results - testing_results)
+    # testing_results = testing()
+    # validation_results = validate()
+    testing_results = loading_from_json("savedresults", "testing")
+    validation_results = loading_from_json("savedresults", "validation")
+    print((abs(sum(validation_results)) - abs(sum(testing_results)))/len(testing_results))
