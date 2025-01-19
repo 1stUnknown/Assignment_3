@@ -87,7 +87,7 @@ def main():
         print("[INFO] Exiting after Saving!")
 
 
-def testing() -> float:
+def testing():
     amount_of_nns = 10
     top_x = 3
     num_episodes = 10
@@ -117,7 +117,7 @@ def testing() -> float:
     return sum(results)/len(results)
     
 
-def validate() -> float:
+def validate():
     """
     once done training, validate the neural networks
     """
@@ -142,14 +142,11 @@ def validate() -> float:
         for index in range(len(saved_weights), amount_of_nns):
             list_of_nn[index].set_weights(choice(saved_weights), True)
 
-    results = main_loop(list_of_nn, range_of_seed=(100, 200),
+    results = main_loop(list_of_nn, range_of_seed=(101,200),
               length_of_running_program=100, top_x = top_x,
               num_episodes = num_episodes, modify_weights=False)
     
     save_to_json(results, "savedresults", "validation")
-
-    return sum(results)/len(results)
-    
 
 def main_loop(list_of_nn: list[NeuralNetwork], 
               range_of_seed: tuple = (0,100), 
@@ -201,8 +198,8 @@ def main_loop(list_of_nn: list[NeuralNetwork],
 
 if __name__ == "__main__":
     # main()
-    # testing_results = testing()
-    # validation_results = validate()
+    # testing()
+    validate()
     testing_results = loading_from_json("savedresults", "testing")
     validation_results = loading_from_json("savedresults", "validation")
     print((abs(sum(validation_results)) - abs(sum(testing_results)))/len(testing_results))
