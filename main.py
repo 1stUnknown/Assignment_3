@@ -1,5 +1,6 @@
 import gymnasium as gym
 import numpy as np
+import math
 
 import ale_py
 
@@ -20,7 +21,7 @@ nn_results: list[tuple[int, float, np.ndarray]] = []
 def play_pong(nn: NeuralNetwork,
               id: int,
               num_episodes: int = 5,
-              range_of_seed: tuple = (0,100)) -> list[float]:
+              range_of_seed: tuple = (1,100)) -> list[float]:
     global nn_results
     env = gym.make('ALE/Pong-v5')
     env = GrayscaleObservation(env)
@@ -88,7 +89,7 @@ def main():
 
 
 def testing():
-    amount_of_nns = 10
+    amount_of_nns = 6
     top_x = 3
     num_episodes = 10
 
@@ -107,7 +108,7 @@ def testing():
             list_of_nn[index].set_weights(weight)
 
         for index in range(len(saved_weights), amount_of_nns):
-            list_of_nn[index].set_weights(choice(saved_weights), True)
+            list_of_nn[index].set_weights(saved_weights[index-len(saved_weights)])
 
     results = main_loop(list_of_nn, length_of_running_program=100, top_x=top_x,
               num_episodes=num_episodes, modify_weights=False)
@@ -140,7 +141,7 @@ def validate():
             list_of_nn[index].set_weights(weight)
 
         for index in range(len(saved_weights), amount_of_nns):
-            list_of_nn[index].set_weights(choice(saved_weights), True)
+            list_of_nn[index].set_weights(saved_weights[index-len(saved_weights)])
 
     results = main_loop(list_of_nn, range_of_seed=(101,200),
               length_of_running_program=100, top_x = top_x,
@@ -149,7 +150,7 @@ def validate():
     save_to_json(results, "savedresults", "validation")
 
 def main_loop(list_of_nn: list[NeuralNetwork], 
-              range_of_seed: tuple = (0,100), 
+              range_of_seed: tuple = (1,100), 
               length_of_running_program: int = float("inf"),
               top_x: int = 3, num_episodes: int = 10, 
               modify_weights: bool = True) -> list[float]:
@@ -195,11 +196,39 @@ def main_loop(list_of_nn: list[NeuralNetwork],
 
     return list_of_match_results
 
+def calculate_mean_sd_and_median():
+    # Load test results
+    testing_results = loading_from_json("savedresults", "testing")
+    validation_results = loading_from_json("savedresults", "validation")
+
+    #Sort lists for median
+    testing_results.sort()
+    validation_results.sort()
+
+    #Calculate mean value
+    mean_testing = sum(testing_results)/len(testing_results)
+    mean_validation = sum(validation_results)/len(validation_results)
+
+    sd_testing_list = [math.pow(value - mean_testing, 2) for value in testing_results]
+    sd_validation_list = [math.pow(value - mean_validation, 2) for value in validation_results]
+    sd_testing = math.sqrt(sum(sd_testing_list)/len(testing_results))
+    sd_validation = math.sqrt(sum(sd_validation_list)/len(validation_results))
+
+    #Location of median
+    testing_median_location = len(testing_results)//2
+    validation_median_location = len(testing_results)//2
+
+    print(f"testing mean: {mean_testing}\nvalidation mean: {mean_validation}")
+    print(f"difference between means: {abs(mean_validation) - abs(mean_testing):.5f}")
+
+    print(f"sd of testing: {sd_testing:.5f}\nsd of validation: {sd_validation:.5f}")
+
+    print(f"testing median: {testing_results[testing_median_location]}\n"
+          + f"validation median: {validation_results[validation_median_location]}")
+    print(f"difference between medians: {abs(testing_results[testing_median_location]) - abs(validation_results[validation_median_location])}")
 
 if __name__ == "__main__":
     # main()
-    # testing()
+    testing()
     validate()
-    testing_results = loading_from_json("savedresults", "testing")
-    validation_results = loading_from_json("savedresults", "validation")
-    print((abs(sum(validation_results)) - abs(sum(testing_results)))/len(testing_results))
+    calculate_mean_sd_and_median()
