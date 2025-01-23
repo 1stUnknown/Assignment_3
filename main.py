@@ -79,7 +79,7 @@ def main():
     top_x = 3
     num_episodes = 10
 
-    list_of_nn = loading_weights(amount_of_nns)
+    list_of_nn = loading_weights(amount_of_nns, True)
     
     try:
         main_loop(list_of_nn, top_x=top_x, num_episodes=num_episodes)
