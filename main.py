@@ -55,14 +55,8 @@ def play_pong(nn: NeuralNetwork,
     nn_results.append((id, whole_match_reward, nn.weights()))
     env.close()
 
-
-def main():
-    amount_of_nns = 10
-    top_x = 3
-    num_episodes = 10
-
-    list_of_nn: list[NeuralNetwork] = [NeuralNetwork() for _ in
-                                       range(amount_of_nns)]
+def loading_weights(amount_of_nns: int, randomness: bool = False) -> list[NeuralNetwork] | None:
+    list_of_nn = [NeuralNetwork() for _ in range(amount_of_nns)]
 
     if isdir("./savedweights"):
         file_names: list[str] = listdir("./savedweights")
@@ -76,7 +70,17 @@ def main():
             list_of_nn[index].set_weights(weight)
 
         for index in range(len(saved_weights), amount_of_nns):
-            list_of_nn[index].set_weights(choice(saved_weights), True)
+            list_of_nn[index].set_weights(choice(saved_weights), randomness)
+
+    return list_of_nn
+
+def main():
+    amount_of_nns = 10
+    top_x = 3
+    num_episodes = 10
+
+    list_of_nn = loading_weights(amount_of_nns)
+    
     try:
         main_loop(list_of_nn, top_x=top_x, num_episodes=num_episodes)
     except KeyboardInterrupt:
@@ -88,60 +92,22 @@ def main():
         print("[INFO] Exiting after Saving!")
 
 
-def testing():
-    amount_of_nns = 6
-    top_x = 3
-    num_episodes = 10
-
-    list_of_nn: list[NeuralNetwork] = [NeuralNetwork() for _ in
-                                       range(amount_of_nns)]
-
-    if isdir("./savedweights"):
-        file_names: list[str] = listdir("./savedweights")
-
-        saved_weights: list[list[np.ndarray]] = []
-        for name in file_names:
-            data = loading_weights_from_json(name)
-            saved_weights.append(data)
-
-        for index, weight in enumerate(saved_weights):
-            list_of_nn[index].set_weights(weight)
-
-        for index in range(len(saved_weights), amount_of_nns):
-            list_of_nn[index].set_weights(saved_weights[index-len(saved_weights)])
+def testing(amount_of_nns: list[NeuralNetwork], top_x: int, num_episodes: int):
+    
+    list_of_nn = loading_weights(amount_of_nns)
 
     results = main_loop(list_of_nn, length_of_running_program=100, top_x=top_x,
               num_episodes=num_episodes, modify_weights=False)
     
     save_to_json(results, "savedresults", "testing.json")
-
-    return sum(results)/len(results)
     
 
-def validate():
+def validate(amount_of_nns: int, top_x: int, num_episodes: int):
     """
     once done training, validate the neural networks
     """
-    amount_of_nns = 6
-    top_x = 3
-    num_episodes = 10
 
-    list_of_nn: list[NeuralNetwork] = [NeuralNetwork() for _ in
-                                       range(amount_of_nns)]
-
-    if isdir("./savedweights"):
-        file_names: list[str] = listdir("./savedweights")
-
-        saved_weights: list[list[np.ndarray]] = []
-        for name in file_names:
-            data = loading_weights_from_json(name)
-            saved_weights.append(data)
-
-        for index, weight in enumerate(saved_weights):
-            list_of_nn[index].set_weights(weight)
-
-        for index in range(len(saved_weights), amount_of_nns):
-            list_of_nn[index].set_weights(saved_weights[index-len(saved_weights)])
+    list_of_nn = loading_weights(amount_of_nns)
 
     results = main_loop(list_of_nn, range_of_seed=(101,200),
               length_of_running_program=100, top_x = top_x,
@@ -226,8 +192,13 @@ def calculate_mean_sd_and_median():
           + f"validation median: {validation_results[validation_median_location]:.5f}")
     print(f"difference between medians: {abs(validation_results[validation_median_location]) - abs(testing_results[testing_median_location])}")
 
+
+
 if __name__ == "__main__":
+    # amount_of_nns = 6
+    # top_x = 3
+    # num_episodes = 10
     # main()
-    # testing()
-    # validate()
+    # testing(amount_of_nns, top_x, num_episodes)
+    # validate(amount_of_nns, top_x, num_episodes)
     calculate_mean_sd_and_median()
