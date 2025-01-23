@@ -115,8 +115,12 @@ def loading_weights(amount_of_nns: int, randomness: bool = False) -> list[Neural
         for index, weight in enumerate(saved_weights):
             list_of_nn[index].set_weights(weight)
 
-        for index in range(len(saved_weights), amount_of_nns):
-            list_of_nn[index].set_weights(choice(saved_weights), randomness)
+        if randomness:
+            for index in range(len(saved_weights), amount_of_nns):
+                list_of_nn[index].set_weights(choice(saved_weights), randomness)
+        else:
+            for index in range(len(saved_weights), amount_of_nns):
+                list_of_nn[index].set_weights(saved_weights[index-len(saved_weights)], randomness)
 
     return list_of_nn
 
