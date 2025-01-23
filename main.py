@@ -104,8 +104,9 @@ def main_loop(list_of_nn: list[NeuralNetwork],
 
 
 def loading_weights(amount_of_nns: int,
-                    training: bool = False) -> list[NeuralNetwork] | None:
-    list_of_nn = [NeuralNetwork() for _ in range(amount_of_nns)]
+                    training: bool = False) -> list[NeuralNetwork]:
+    list_of_nn: list[NeuralNetwork] = [NeuralNetwork() for _ in
+                                       range(amount_of_nns)]
 
     if isdir("./savedweights"):
         file_names: list[str] = listdir("./savedweights")
