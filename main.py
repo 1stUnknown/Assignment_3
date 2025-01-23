@@ -21,7 +21,7 @@ nn_results: list[tuple[int, float, np.ndarray]] = []
 def play_pong(nn: NeuralNetwork,
               id: int,
               num_episodes: int = 5,
-              range_of_seed: tuple = (1,100)) -> list[float]:
+              range_of_seed: tuple = (1, 100)) -> list[float]:
     global nn_results
     env = gym.make('ALE/Pong-v5')
     env = GrayscaleObservation(env)
@@ -31,7 +31,8 @@ def play_pong(nn: NeuralNetwork,
         done = False
         total_reward: float = 0
 
-        state, info = env.reset(seed=randint(range_of_seed[0], range_of_seed[1]))
+        state, info = env.reset(seed=randint(range_of_seed[0],
+                                             range_of_seed[1]))
 
         while not done:
 
@@ -81,7 +82,8 @@ def main():
         main_loop(list_of_nn, top_x=top_x, num_episodes=num_episodes)
     except KeyboardInterrupt:
         # TODO save the total rewards between test and validate
-        print("[INFO] Exiting after KeyboardInterupt; proceeding to save weights before exiting")
+        print("[INFO] Exiting after KeyboardInterupt; " +
+              "proceeding to save weights before exiting")
         top_weights, _ = get_top(nn_results, top_x)
         for index, weight in enumerate(top_weights):
             saving_weights_to_json(weight, f"{index}")
@@ -108,15 +110,16 @@ def testing():
             list_of_nn[index].set_weights(weight)
 
         for index in range(len(saved_weights), amount_of_nns):
-            list_of_nn[index].set_weights(saved_weights[index-len(saved_weights)])
+            list_of_nn[index].set_weights(saved_weights[index -
+                                                        len(saved_weights)])
 
     results = main_loop(list_of_nn, length_of_running_program=100, top_x=top_x,
-              num_episodes=num_episodes, modify_weights=False)
-    
+                        num_episodes=num_episodes, modify_weights=False)
+
     save_to_json(results, "savedresults", "testing.json")
 
     return sum(results)/len(results)
-    
+
 
 def validate():
     """
@@ -141,24 +144,25 @@ def validate():
             list_of_nn[index].set_weights(weight)
 
         for index in range(len(saved_weights), amount_of_nns):
-            list_of_nn[index].set_weights(saved_weights[index-len(saved_weights)])
+            list_of_nn[index].set_weights(saved_weights[index -
+                                                        len(saved_weights)])
 
-    results = main_loop(list_of_nn, range_of_seed=(101,200),
-              length_of_running_program=100, top_x = top_x,
-              num_episodes = num_episodes, modify_weights=False)
-    
+    results = main_loop(list_of_nn, range_of_seed=(101, 200),
+                        length_of_running_program=100, top_x=top_x,
+                        num_episodes=num_episodes, modify_weights=False)
+
     save_to_json(results, "savedresults", "validation")
 
-def main_loop(list_of_nn: list[NeuralNetwork], 
-              range_of_seed: tuple = (1,100), 
+
+def main_loop(list_of_nn: list[NeuralNetwork],
+              range_of_seed: tuple = (1, 100),
               length_of_running_program: int = float("inf"),
-              top_x: int = 3, num_episodes: int = 10, 
+              top_x: int = 3, num_episodes: int = 10,
               modify_weights: bool = True) -> list[float]:
 
     if top_x >= len(list_of_nn):
         raise ValueError("top x is equal or greater than"
                          + "the amount of neural networks given")
-
 
     i = 0
     list_of_match_results = []
@@ -167,10 +171,10 @@ def main_loop(list_of_nn: list[NeuralNetwork],
 
         for index, nn in enumerate(list_of_nn):
             threads.append(Thread(target=play_pong,
-                                    args=(nn, 
-                                          index, 
-                                          num_episodes, 
-                                          range_of_seed,)))
+                                  args=(nn,
+                                        index,
+                                        num_episodes,
+                                        range_of_seed,)))
 
         # Start all threads.
         for t in threads:
@@ -195,36 +199,46 @@ def main_loop(list_of_nn: list[NeuralNetwork],
 
     return list_of_match_results
 
+
 def calculate_mean_sd_and_median():
     # Load test results
     testing_results = loading_from_json("savedresults", "testing")
     validation_results = loading_from_json("savedresults", "validation")
 
-    #Sort lists for median
+    # Sort lists for median
     testing_results.sort()
     validation_results.sort()
 
-    #Calculate mean value
+    # Calculate mean value
     mean_testing = sum(testing_results)/len(testing_results)
     mean_validation = sum(validation_results)/len(validation_results)
 
-    sd_testing_list = [math.pow(value - mean_testing, 2) for value in testing_results]
-    sd_validation_list = [math.pow(value - mean_validation, 2) for value in validation_results]
+    sd_testing_list = [math.pow(value - mean_testing, 2) for value
+                       in testing_results]
+    sd_validation_list = [math.pow(value - mean_validation, 2) for value
+                          in validation_results]
     sd_testing = math.sqrt(sum(sd_testing_list)/len(testing_results))
     sd_validation = math.sqrt(sum(sd_validation_list)/len(validation_results))
 
-    #Location of median
+    # Location of median
     testing_median_location = len(testing_results)//2
     validation_median_location = len(testing_results)//2
 
-    print(f"testing mean: {mean_testing:.5f}\nvalidation mean: {mean_validation:.5f}")
-    print(f"difference between means: {abs(mean_validation) - abs(mean_testing):.5f}")
+    print(f"testing mean: {mean_testing:.5f}" +
+          f"\nvalidation mean: {mean_validation:.5f}")
+    print("difference between means: " +
+          f"{abs(mean_validation) - abs(mean_testing):.5f}")
 
-    print(f"sd of testing: {sd_testing:.5f}\nsd of validation: {sd_validation:.5f}")
+    print(f"sd of testing: {sd_testing:.5f}" +
+          f"\nsd of validation: {sd_validation:.5f}")
 
     print(f"testing median: {testing_results[testing_median_location]:.5f}\n"
-          + f"validation median: {validation_results[validation_median_location]:.5f}")
-    print(f"difference between medians: {abs(validation_results[validation_median_location]) - abs(testing_results[testing_median_location])}")
+          + f"validation median: {validation_results[
+              validation_median_location]:.5f}")
+    print("difference between medians: " +
+          f"{abs(validation_results[validation_median_location]) - abs(
+              testing_results[testing_median_location])}")
+
 
 if __name__ == "__main__":
     # main()
