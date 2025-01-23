@@ -55,6 +55,52 @@ def play_pong(nn: NeuralNetwork,
     nn_results.append((id, whole_match_reward, nn.weights()))
     env.close()
 
+def main_loop(list_of_nn: list[NeuralNetwork],
+              range_of_seed: tuple = (1,100),
+              length_of_running_program: int = float("inf"),
+              top_x: int = 3, num_episodes: int = 10,
+              modify_weights: bool = True) -> list[float]:
+
+    if top_x >= len(list_of_nn):
+        raise ValueError("top x is equal or greater than"
+                         + "the amount of neural networks given")
+
+
+    i = 0
+    list_of_match_results = []
+    while i < length_of_running_program:
+        threads = []
+
+        for index, nn in enumerate(list_of_nn):
+            threads.append(Thread(target=play_pong,
+                                    args=(nn,
+                                          index,
+                                          num_episodes,
+                                          range_of_seed,)))
+
+        # Start all threads.
+        for t in threads:
+            t.start()
+
+        # Wait for all threads to finish.
+        for t in threads:
+            t.join()
+
+        if modify_weights:
+            # order the results
+            top_weights, ids_of_top_results = get_top(nn_results, top_x)
+
+            for index in range(len(list_of_nn)):
+                if index in ids_of_top_results:
+                    continue
+
+                list_of_nn[index].set_weights(choice(top_weights), True)
+        list_of_match_results.extend([item[1] for item in nn_results])
+        nn_results.clear()
+        i += 1
+
+    return list_of_match_results
+
 def loading_weights(amount_of_nns: int, randomness: bool = False) -> list[NeuralNetwork] | None:
     list_of_nn = [NeuralNetwork() for _ in range(amount_of_nns)]
 
@@ -115,51 +161,6 @@ def validate(amount_of_nns: int, top_x: int, num_episodes: int):
 
     save_to_json(results, "savedresults", "validation")
 
-def main_loop(list_of_nn: list[NeuralNetwork],
-              range_of_seed: tuple = (1,100),
-              length_of_running_program: int = float("inf"),
-              top_x: int = 3, num_episodes: int = 10,
-              modify_weights: bool = True) -> list[float]:
-
-    if top_x >= len(list_of_nn):
-        raise ValueError("top x is equal or greater than"
-                         + "the amount of neural networks given")
-
-
-    i = 0
-    list_of_match_results = []
-    while i < length_of_running_program:
-        threads = []
-
-        for index, nn in enumerate(list_of_nn):
-            threads.append(Thread(target=play_pong,
-                                    args=(nn,
-                                          index,
-                                          num_episodes,
-                                          range_of_seed,)))
-
-        # Start all threads.
-        for t in threads:
-            t.start()
-
-        # Wait for all threads to finish.
-        for t in threads:
-            t.join()
-
-        if modify_weights:
-            # order the results
-            top_weights, ids_of_top_results = get_top(nn_results, top_x)
-
-            for index in range(len(list_of_nn)):
-                if index in ids_of_top_results:
-                    continue
-
-                list_of_nn[index].set_weights(choice(top_weights), True)
-        list_of_match_results.extend([item[1] for item in nn_results])
-        nn_results.clear()
-        i += 1
-
-    return list_of_match_results
 
 def calculate_mean_sd_and_median():
     # Load test results
@@ -191,8 +192,6 @@ def calculate_mean_sd_and_median():
     print(f"testing median: {testing_results[testing_median_location]:.5f}\n"
           + f"validation median: {validation_results[validation_median_location]:.5f}")
     print(f"difference between medians: {abs(validation_results[validation_median_location]) - abs(testing_results[testing_median_location])}")
-
-
 
 if __name__ == "__main__":
     # amount_of_nns = 6
