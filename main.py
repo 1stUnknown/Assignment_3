@@ -122,7 +122,7 @@ def validate():
     """
     once done training, validate the neural networks
     """
-    amount_of_nns = 10
+    amount_of_nns = 6
     top_x = 3
     num_episodes = 10
 
@@ -190,7 +190,6 @@ def main_loop(list_of_nn: list[NeuralNetwork],
 
                 list_of_nn[index].set_weights(choice(top_weights), True)
         list_of_match_results.extend([item[1] for item in nn_results])
-        # I don't know if this would work. I would just use list comprehension instead of slicing
         nn_results.clear()
         i += 1
 
@@ -218,17 +217,17 @@ def calculate_mean_sd_and_median():
     testing_median_location = len(testing_results)//2
     validation_median_location = len(testing_results)//2
 
-    print(f"testing mean: {mean_testing}\nvalidation mean: {mean_validation}")
+    print(f"testing mean: {mean_testing:.5f}\nvalidation mean: {mean_validation:.5f}")
     print(f"difference between means: {abs(mean_validation) - abs(mean_testing):.5f}")
 
     print(f"sd of testing: {sd_testing:.5f}\nsd of validation: {sd_validation:.5f}")
 
-    print(f"testing median: {testing_results[testing_median_location]}\n"
-          + f"validation median: {validation_results[validation_median_location]}")
-    print(f"difference between medians: {abs(testing_results[testing_median_location]) - abs(validation_results[validation_median_location])}")
+    print(f"testing median: {testing_results[testing_median_location]:.5f}\n"
+          + f"validation median: {validation_results[validation_median_location]:.5f}")
+    print(f"difference between medians: {abs(validation_results[validation_median_location]) - abs(testing_results[testing_median_location])}")
 
 if __name__ == "__main__":
     # main()
-    testing()
-    validate()
+    # testing()
+    # validate()
     calculate_mean_sd_and_median()
