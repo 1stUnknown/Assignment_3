@@ -101,28 +101,31 @@ def main_loop(list_of_nn: list[NeuralNetwork],
 
     return list_of_match_results
 
-def loading_weights(amount_of_nns: int, randomness: bool = False) -> list[NeuralNetwork] | None:
+
+def loading_weights(amount_of_nns: int,
+                    training: bool = False) -> list[NeuralNetwork] | None:
     list_of_nn = [NeuralNetwork() for _ in range(amount_of_nns)]
 
     if isdir("./savedweights"):
         file_names: list[str] = listdir("./savedweights")
-
         saved_weights: list[list[np.ndarray]] = []
+
         for name in file_names:
-            data = loading_weights_from_json(name)
-            saved_weights.append(data)
+            saved_weights.append(loading_weights_from_json(name))
 
-        for index, weight in enumerate(saved_weights):
-            list_of_nn[index].set_weights(weight)
+        if training:
+            for index, weight in enumerate(saved_weights):
+                list_of_nn[index].set_weights(weight)
 
-        if randomness:
             for index in range(len(saved_weights), amount_of_nns):
-                list_of_nn[index].set_weights(choice(saved_weights), randomness)
+                list_of_nn[index].set_weights(choice(saved_weights), True)
         else:
-            for index in range(len(saved_weights), amount_of_nns):
-                list_of_nn[index].set_weights(saved_weights[index-len(saved_weights)], randomness)
+            for nn_index in range(amount_of_nns):
+                list_of_nn[nn_index].set_weights(
+                    saved_weights[nn_index % len(saved_weights)])
 
     return list_of_nn
+
 
 def main():
     amount_of_nns = 10
