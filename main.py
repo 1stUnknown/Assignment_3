@@ -112,13 +112,13 @@ def validate(amount_of_nns: int, top_x: int, num_episodes: int):
     results = main_loop(list_of_nn, range_of_seed=(101,200),
               length_of_running_program=100, top_x = top_x,
               num_episodes = num_episodes, modify_weights=False)
-    
+
     save_to_json(results, "savedresults", "validation")
 
-def main_loop(list_of_nn: list[NeuralNetwork], 
-              range_of_seed: tuple = (1,100), 
+def main_loop(list_of_nn: list[NeuralNetwork],
+              range_of_seed: tuple = (1,100),
               length_of_running_program: int = float("inf"),
-              top_x: int = 3, num_episodes: int = 10, 
+              top_x: int = 3, num_episodes: int = 10,
               modify_weights: bool = True) -> list[float]:
 
     if top_x >= len(list_of_nn):
@@ -133,9 +133,9 @@ def main_loop(list_of_nn: list[NeuralNetwork],
 
         for index, nn in enumerate(list_of_nn):
             threads.append(Thread(target=play_pong,
-                                    args=(nn, 
-                                          index, 
-                                          num_episodes, 
+                                    args=(nn,
+                                          index,
+                                          num_episodes,
                                           range_of_seed,)))
 
         # Start all threads.
@@ -198,7 +198,7 @@ if __name__ == "__main__":
     # amount_of_nns = 6
     # top_x = 3
     # num_episodes = 10
-    # main()
+    main()
     # testing(amount_of_nns, top_x, num_episodes)
     # validate(amount_of_nns, top_x, num_episodes)
     calculate_mean_sd_and_median()
